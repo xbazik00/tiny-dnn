@@ -66,6 +66,7 @@ option(BUILD_BENCHMARKS "Set to ON to build benchmarks"         OFF)
 option(COVERALLS        "Set to ON to build with code coverage" OFF)
 option(PROFILE          "Set to ON to build with profiling"     OFF)
 option(USE_ASAN         "Set to ON to build with ASan"          OFF)
+option(USE_QUANT        "Set to ON to build with quantized"     OFF)
 
 ####
 # Create the library target
@@ -105,6 +106,10 @@ elseif(USE_TBB AND NOT TBB_FOUND)
     # set the paths to headers and libs by hand.
     message(FATAL_ERROR "Intel TBB not found. Please set TBB_INCLUDE_DIRS & "
             "TBB_LIBRARIES")
+endif()
+
+if(USE_QUANT)
+    add_definitions(-DQUANT)
 endif()
 
 if(NOT USE_SERIALIZER)

@@ -10,9 +10,11 @@
 #include <algorithm>
 #include <vector>
 
-#ifdef CNN_USE_GEMMLOWP
+
 #include "tiny_dnn/core/kernels/tiny_quantization_kernel.h"
+#ifdef CNN_USE_GEMMLOWP
 #include "tiny_dnn/core/kernels/tiny_quantized_matmul_kernel.h"
+#endif
 #include "tiny_dnn/core/params/fully_params.h"
 
 namespace tiny_dnn {
@@ -81,7 +83,7 @@ inline void tiny_quantized_fully_connected_kernel(
     float_to_quantized_unclamped<uint8_t>(0.0f, min_filter, max_filter);
   const int32_t zero_in_total_space =
     float_to_quantized<int32_t>(0.0f, min_output_value, max_output_value);
-
+  #ifdef CNN_USE_GEMMLOWP
   const int32_t offset_output = 0;
   const int32_t mult_output   = 1;
   const int32_t shift_output  = 0;
@@ -98,6 +100,7 @@ inline void tiny_quantized_fully_connected_kernel(
             [&](size_t i) { out[i] += b[i]; });
     }
   } else {
+    #endif  // CNN_USE_GEMMLOWP
     for_i(layer_parallelize, params.out_size_, [&](size_t i) {
       for (size_t c = 0; c < params.in_size_; c++) {
         out_quantized[i] +=
@@ -109,7 +112,9 @@ inline void tiny_quantized_fully_connected_kernel(
         out_quantized[i] += (bias_quantized[i] - zero_in_total_space);
       }
     });
+    #ifdef CNN_USE_GEMMLOWP
   }
+  #endif  // CNN_USE_GEMMLOWP
 
   float_t min_output_requantized;
   float_t max_output_requantized;
@@ -265,7 +270,7 @@ inline void tiny_quantized_fully_connected_back_kernel(
   dW = quantized_tensor_to_float<uint8_t>(dW_requantized, min_dW_requantized,
                                           max_dW_requantized);
 }
-
+#ifdef CNN_USE_GEMMLOWP
 inline void tiny_quantized_fully_connected_kernel(
   const fully_params &params,
   const vec_t &in,
@@ -368,9 +373,9 @@ inline void tiny_quantized_fully_connected_kernel(
   out_r[0] = min_output_requantized;
   out_r[1] = max_output_requantized;
 }
-
+#endif  // CNN_USE_GEMMLOWP
 }  // namespace kernels
 }  // namespace core
 }  // namespace tiny_dnn
 
-#endif  // CNN_USE_GEMMLOWP
+
