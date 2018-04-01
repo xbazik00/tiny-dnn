@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include "tiny_dnn/core/fixed.h"
 
 /**
  * define if you want to use intel TBB library
@@ -90,5 +91,7 @@ typedef double float_t;
 #else
 typedef float float_t;
 #endif
+
+typedef numeric::Fixed<int, 23> fixed_t;
 
 }  // namespace tiny_dnn
