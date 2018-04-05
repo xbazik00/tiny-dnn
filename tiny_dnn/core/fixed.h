@@ -10,7 +10,7 @@
 #include <cmath>
 
 namespace numeric{
-template<typename T,size_t X, size_t Y = std::numeric_limits<T>::digits - X>
+template<typename T, size_t X, size_t Y = std::numeric_limits<T>::digits - X>
 class Fixed : 
   boost::ordered_field_operators<Fixed<T, X>,
   boost::unit_steppable<Fixed<T, X>, 
@@ -30,7 +30,7 @@ public:
 
   template<typename TP>
   Fixed(TP x){
-    data_ = ((T) x) << Y;
+    data_ = static_cast<T>(x) << Y;
   }
 
   Fixed(double x){
@@ -65,13 +65,22 @@ public:
   }
 
   numeric::Fixed<T,X> & operator *=(const numeric::Fixed<T,X>& x){
-    data_ = data_ * x.data_ >> Y;
+    data_ = static_cast<int64_t>(data_) * x.data_ >> Y;
     return *this;
   }
 
   numeric::Fixed<T,X> & operator /=(const numeric::Fixed<T,X>& x){
-    data_ = (data_ << Y) / x.data_;
+    data_ = static_cast<int64_t>(data_ << Y) / x.data_;
     return *this;
+  }
+
+
+  bool operator >(const numeric::Fixed<T,X>& x){
+    return data_ > x.data_;
+  }
+
+  bool operator <(const numeric::Fixed<T,X>& x){
+    return data_ < x.data_;
   }
 
   template<typename SS, typename TP, size_t XP>

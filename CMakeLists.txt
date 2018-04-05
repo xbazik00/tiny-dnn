@@ -67,6 +67,8 @@ option(COVERALLS        "Set to ON to build with code coverage" OFF)
 option(PROFILE          "Set to ON to build with profiling"     OFF)
 option(USE_ASAN         "Set to ON to build with ASan"          OFF)
 option(USE_QUANT        "Set to ON to build with quantized"     OFF)
+option(USE_FIXED        "Set to ON to build with fixed point"   OFF)
+
 
 ####
 # Create the library target
@@ -110,6 +112,10 @@ endif()
 
 if(USE_QUANT)
     add_definitions(-DQUANT)
+endif()
+
+if(USE_FIXED)
+    add_definitions(-DFIXED)
 endif()
 
 if(NOT USE_SERIALIZER)
