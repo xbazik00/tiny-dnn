@@ -37,6 +37,8 @@ static const bool tbl[] = {
   using conv = tiny_dnn::layers::conv;
   using ave_pool = tiny_dnn::layers::ave_pool;
   using tanh = tiny_dnn::activation::tanh;
+  using softmax = tiny_dnn::activation::softmax;
+  using relu = tiny_dnn::activation::relu;
 
   using tiny_dnn::core::connection_table;
   using padding = tiny_dnn::padding;
@@ -44,20 +46,29 @@ static const bool tbl[] = {
   nn << conv(32, 32, 5, 1, 6,   // C1, 1@32x32-in, 6@28x28-out
              padding::valid, true, 1, 1, backend_type)
      << tanh()
+     //<< relu()
      << ave_pool(28, 28, 6, 2)   // S2, 6@28x28-in, 6@14x14-out
      << tanh()
+     //<< relu()
      << conv(14, 14, 5, 6, 16,   // C3, 6@14x14-in, 16@10x10-out
              connection_table(tbl, 6, 16),
              padding::valid, true, 1, 1, backend_type)
      << tanh()
+     //<< relu()
      << ave_pool(10, 10, 16, 2)  // S4, 16@10x10-in, 16@5x5-out
      << tanh()
+     //<< relu()
      << conv(5, 5, 5, 16, 120,   // C5, 16@5x5-in, 120@1x1-out
              padding::valid, true, 1, 1, backend_type)
      << tanh()
-     << fc(120, 10, true, backend_type)  // F6, 120-in, 10-out
-     << tanh();
-}
+     //<< relu()
+     //<< fc(120, 10, true, backend_type)  // F6, 120-in, 10-out
+     << fc(120, 64, true, backend_type)
+     << tanh()
+     << fc(64, 10, true, backend_type)
+     //<< tanh();
+     << softmax();
+    }
 
 static void train_lenet(const std::string &data_dir_path,
                         double learning_rate,
@@ -110,7 +121,7 @@ static void train_lenet(const std::string &data_dir_path,
   auto on_enumerate_minibatch = [&]() { disp += n_minibatch; };
 
   // training
-  nn.train<tiny_dnn::mse>(optimizer, train_images, train_labels, n_minibatch,
+  nn.train<tiny_dnn::cross_entropy>(optimizer, train_images, train_labels, n_minibatch,
                           n_train_epochs, on_enumerate_minibatch,
                           on_enumerate_epoch);
 

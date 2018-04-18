@@ -49,6 +49,10 @@ public:
     return data_ / pow_Y;
   }
 
+  //operator double&() { static double b = data_ / pow_Y; return b; }
+
+
+
   template<typename TP>
   operator TP() const{
     return data_ >> Y;
