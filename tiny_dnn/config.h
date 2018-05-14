@@ -92,6 +92,7 @@ typedef double float_t;
 typedef float float_t;
 #endif
 
-typedef numeric::Fixed<int16_t, 4> fixed_t;
+typedef numeric::Fixed<int16_t, 5> fixed_t;
+
 
 }  // namespace tiny_dnn

@@ -25,7 +25,6 @@ inline void conv2d_op_internal(const tensor_t &in_data,
       [&](const blocked_range &r) {
         size_t out_area    = params.out.area();
         size_t iw          = params.in_padded.width_;
-        size_t ih          = params.in_padded.height_;
         size_t id          = params.in.depth_;
         size_t ow          = params.out.width_;
         size_t oh          = params.out.height_;
